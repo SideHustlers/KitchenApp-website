@@ -7,11 +7,14 @@
     "start": "next start"
   },
   "dependencies": {
+    "@apollo/client": "^3.3.3",
     "antd": "^4.8.6",
     "aphrodite": "^2.3.1",
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
+    "graphql": "^15.4.0",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
     "next": "latest",
     "nprogress": "^0.2.0",
     "react": "^16.7.0",
