@@ -7,6 +7,7 @@ import RecipeCard from "../../components/RecipeCard";
 import { useQuery } from "@apollo/client";
 
 import {RECIPES_QUERY} from '../../gql/queries/recipes';
+import Loader from "../../components/Loader";
 
 const { Step } = Steps;
 
@@ -21,7 +22,7 @@ const Recipes = props => {
     return (
       <Container>
         <h3 className={css(styles.title)}>All Recipes</h3>
-        <hr style={{marginBottom: 30}}/>
+        {/* <hr style={{marginBottom: 30}}/> */}
         <div className={css(styles.cardContainer)}>
           {data && 
             data.recipes.map((recipe, index) => (
@@ -33,7 +34,7 @@ const Recipes = props => {
     );
   } else {
     return (
-      <Spin spinning={loading} delay={0} size="large" />
+      <Loader overlay={false} hasHeader={true} />
     )
   }
 }
@@ -41,7 +42,7 @@ const Recipes = props => {
 
 const styles = StyleSheet.create({
   title: {
-    marginBottom: 20,
+    marginBottom: 40,
     marginTop: 30
   },
   cardContainer: {

@@ -4,18 +4,16 @@ import "antd/dist/antd.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../assets/css/override_header.css';
 import '../assets/css/override_steps.css';
+import '../assets/css/override_ant.css';
+import '../assets/css/calendar.css';
 import { Layout } from 'antd';
-import Router from 'next/router';
-import NProgress from 'nprogress'; //nprogress module
-import 'nprogress/nprogress.css'; //styles of nprogress
 
 import { ApolloProvider } from "@apollo/client";
 import { useApollo } from "../ApolloClient";
 
+import NProgressLoader from '../components/NProgressLoader';
 import NavBar from '../components/NavBar';
-const { Header, Content } = Layout;
-
-Router.events.on('routeChangeStart', () => NProgress.start()); Router.events.on('routeChangeComplete', () => NProgress.done()); Router.events.on('routeChangeError', () => NProgress.done());
+const { Content } = Layout;
 
 export default function MyApp({ Component, pageProps }) {
   const apolloClient = useApollo(pageProps.initialApolloState);
@@ -36,14 +34,15 @@ export default function MyApp({ Component, pageProps }) {
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Castoro"/>
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat"/>
           <link href='https://fonts.googleapis.com/css?family=Sansita Swashed' rel='stylesheet'/>
-          <title>React App</title>
+          <title>Kitchen App</title>
         </head>
         <body>
           <div className="App">
+            <NProgressLoader />
             <Layout>
-              <Header style={{backgroundColor: 'white', boxShadow: '0px 5px 5px rgba(0, 0, 0, 0.1)', position: 'relative', zIndex: 100, height: 'auto'}}>
+              <div style={{position: 'relative', backgroundColor: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.1)', width: '100%', zIndex: 100, height: 'auto'}}>
                 <NavBar />
-              </Header>
+              </div>
               <Content style={{backgroundColor: 'white'}}>
                 <Component {...pageProps} />
               </Content>

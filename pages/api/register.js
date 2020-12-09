@@ -1,5 +1,5 @@
 import Axios from 'axios';
-const CONSTANTS = require('./CONSTANTS');
+const urls = require('../../urls');
 
 export default async function handler(req, res) {
   const {
@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     try {
       let response = await Axios({
         method: 'POST',
-        url: CONSTANTS.REGISTER_URL,
+        url: urls.REGISTER_URL,
         data: req.body
       });
       res.status(200).json(response.data); 

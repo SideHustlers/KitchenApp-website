@@ -31,7 +31,13 @@ const Login = props => {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       setLoading(false);
-      router.push('/');
+      if (localStorage.getItem('redirectUrl')) {
+        let redirectUrl = localStorage.getItem('redirectUrl');
+        localStorage.removeItem('redirectUrl');
+        router.push(redirectUrl);
+      } else {
+        router.push('/')
+      }
     } catch(err) {
       console.log(err.response);
       setLoading(false);

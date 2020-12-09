@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, css } from 'aphrodite';
-import { Steps, Spin, Popover, DatePicker, message } from 'antd';
+import { Steps, Spin, Popover, DatePicker, message, InputNumber } from 'antd';
 import { Container } from 'reactstrap';
 import { useRouter } from 'next/router'
 import { useQuery } from "@apollo/client";
@@ -23,6 +23,14 @@ const Recipe = props => {
   const { loading, error, data } = useQuery(FULL_RECIPE_QUERY(router.query.id));
   const [showPopover, setShowPopover] = useState(false);
   const [date, setDate] = useState(null);
+  const [mealServing, setMealServing] = useState(null);
+  const [showAddMealBtn, setShowAddMealBtn] = useState(null);
+
+  useEffect(() => {
+    if (localStorage.getItem('accessToken')) {
+      setShowAddMealBtn(true);
+    }
+  }, [])
 
   const generateUrls = (media) => {
     const urls = [];
@@ -53,7 +61,10 @@ const Recipe = props => {
 
   const addMealContent = () => (
     <div getPopupContainer={trigger => trigger.parentElement} style={{display: 'flex', flexDirection: 'column'}}>
-      <DatePicker disabledDate={disabledDates} getPopupContainer={trigger => trigger.parentElement} onChange={onChange} value={date} />
+      <p class={css(styles.popoverFormHeading)}>Date</p>
+      <DatePicker disabledDate={disabledDates} style={{marginBottom: 10}} getPopupContainer={trigger => trigger.parentElement} onChange={onChange} value={date} />
+      <p class={css(styles.popoverFormHeading)}>Servings</p>
+      <InputNumber size="middle" placeholder="Servings" style={{width: '100%'}} min={1} value={mealServing} />
       <input className={css(styles.addMenuBtn)} type="submit" value="Add" />
     </div>
   );
@@ -66,21 +77,28 @@ const Recipe = props => {
     }
   }
 
+  useEffect(() => {
+    if (data && data.recipe) {
+      setMealServing(data.recipe.serving_size);
+    }
+  }, [data])
+
   if (!loading) {
     if (error) {
       message.error("Unable to fetch recipe");
       return null;
     } else {
-      console.log('data', data.recipe);
       return (
         <Container>
-          <div className={css(styles.bottomActionButtonContainer)}>
-            <Popover visible={showPopover} placement="topRight" content={addMealContent()} title={"Add to meal"} getPopupContainer={trigger => trigger.parentElement} >
-              <div className={!showPopover ? css(styles.createMealBtn) : css(styles.createMenuBtnClicked)} onClick={() => setShowPopover(!showPopover)}>
-                <IoAddSharp size={40} color="white" />
-              </div>
-            </Popover>
-          </div>
+          {showAddMealBtn && (
+            <div className={css(styles.bottomActionButtonContainer)}>
+              <Popover visible={showPopover} placement="topRight" content={addMealContent()} title={"Add to meal"} getPopupContainer={trigger => trigger.parentElement} >
+                <div className={!showPopover ? css(styles.createMealBtn) : css(styles.createMenuBtnClicked)} onClick={() => setShowPopover(!showPopover)}>
+                  <IoAddSharp size={40} color="white" />
+                </div>
+              </Popover>
+            </div>
+          )}
           <div className={css(styles.info_container)}>
             <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', float: 'left', width: '100%', paddingLeft: 30}}>
               {data.recipe.media.length > 0 ? (
@@ -263,6 +281,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     boxShadow: '0 0 25px rgba(0, 0, 0, 0.1)',
+  },
+  popoverFormHeading: {
+    fontSize: 14,
+    marginBottom: 5,
   }
 })
 
