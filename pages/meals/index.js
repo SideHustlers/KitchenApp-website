@@ -5,6 +5,7 @@ import { BsCalendar, BsViewList } from 'react-icons/bs'
 import Calendar from "../../components/Calendar";
 import { message } from "antd";
 import { useRouter } from "next/router";
+import { getTokenType } from '../../helpers/auth';
 import Loader from "../../components/Loader";
 
 // import { MEALS_QUERY } from '../../gql/queries/meals';
@@ -35,7 +36,7 @@ const Meals = props => {
   ]);
 
   useEffect(() => {
-    if (!localStorage.getItem('accessToken')) {
+    if (!localStorage.getItem('accessToken') || getTokenType() === 'client') {
       localStorage.setItem('redirectUr', '/meals');
       router.push('/login');
     }

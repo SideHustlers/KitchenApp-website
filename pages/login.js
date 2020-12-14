@@ -3,7 +3,7 @@ import { StyleSheet, css } from 'aphrodite';
 import { useRouter } from 'next/router';
 import Axios from 'axios';
 import { message, Spin } from 'antd';
-import jwt from 'jsonwebtoken';
+import { checkTokenType } from '../helpers/auth';
 
 const Login = props => {
   const router = useRouter();
@@ -12,7 +12,7 @@ const Login = props => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    if (localStorage.getItem('accessToken')) {
+    if (checkTokenType('user')) {
       router.push('/');
     }
   }, []);

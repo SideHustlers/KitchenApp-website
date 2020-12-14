@@ -4,7 +4,7 @@
 
 .nav-link {
   color: gray;
-  /* border-bottom: 1px solid transparent !important; */
+  border-bottom: 1px solid transparent !important;
 }
 
 .nav-link:hover {

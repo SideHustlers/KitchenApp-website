@@ -3,6 +3,7 @@ import { useMemo } from "react";
  "@apollo/client";
  import jwt from 'jsonwebtoken';
  import { setContext } from '@apollo/client/link/context';
+ import { getAccessToken } from './helpers/auth';
 
  let apolloClient;
 
@@ -17,23 +18,6 @@ import { useMemo } from "react";
      cache: new InMemoryCache(),
    });
  }
-
- async function getAccessToken() {
-  if (localStorage.getItem('accessToken')) {
-    let token = localStorage.getItem('accessToken')
-    let decoded = jwt.decode(token);
-    let timeThreshold = Date.now() + 120000; // Current time plus 2 minutes
-    const exp = decoded.exp * 1000;
-    if(exp < timeThreshold) {
-      console.log('reached here')
-      //TODO: Fetch refresh token and generate new access token
-    }
-    return token;
-  } else {
-    return null;
-  }
-}
-
  const authLink = setContext(async (_, { headers }) => {
   // get the authentication token from local storage if it exists
   const token = await getAccessToken();

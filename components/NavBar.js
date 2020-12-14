@@ -3,6 +3,7 @@ import { Menu, Dropdown } from 'antd';
 import { useRouter } from 'next/router';
 import { Collapse, Container, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Row } from 'reactstrap';
 import { StyleSheet, css } from 'aphrodite';
+import { getTokenType, logout } from '../helpers/auth';
 import Link from 'next/link';
 import styled from 'styled-components';
 
@@ -32,16 +33,21 @@ const MyNavBar = props => {
     router.push('/');
   }
 
-  const logout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+  const logoutAndPushRouter = async () => {
+    await logout()
     setIsLoggedIn(false);
     router.push('/');
   }
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
-      setIsLoggedIn(true);
+      let type = getTokenType();
+      console.log('type', type);
+      if (type === 'client') {
+        setIsLoggedIn(false);
+      } else {
+        setIsLoggedIn(true);
+      }
     } else {
       setIsLoggedIn(false);
     }
@@ -50,7 +56,7 @@ const MyNavBar = props => {
   const profileDropdown = () => (
     <Menu style={{width: 150}}>
       <Menu.Item>
-        <p className={css(styles.link)} onClick={() => logout()}>Logout</p>
+        <p className={css(styles.link)} onClick={() => logoutAndPushRouter()}>Logout</p>
       </Menu.Item>
     </Menu>
   )
