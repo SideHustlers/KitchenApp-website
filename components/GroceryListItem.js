@@ -29,7 +29,7 @@ const GroceryListItem = ({item, onCheck}) => {
       <p className={css(styles.itemTxt)}>{item.name}</p>
       <div>
         <BsPencil style={{marginRight: 20, cursor: 'pointer'}} />
-        <Checkbox defaultChecked={item.checked} onChange={(e) => onCheck(item, e.target.checked)} />
+        <Checkbox defaultChecked={item.is_fulfilled} onChange={(e) => onCheck(item, e.target.checked)} />
       </div>
     </div>
   )

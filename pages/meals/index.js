@@ -8,32 +8,36 @@ import { useRouter } from "next/router";
 import { getTokenType } from '../../helpers/auth';
 import Loader from "../../components/Loader";
 
-// import { MEALS_QUERY } from '../../gql/queries/meals';
+import { MEALS_QUERY } from '../../gql/queries/meals';
+import { useQuery } from "@apollo/client";
 
 const Meals = props => {
   const router = useRouter();
-  const [meals, setMeals] = useState([
-    {
-      'meal_id': "ABC123",
-      'date': '2020-12-10T00:00:00.000Z',
-      'name': 'Pre-christmas family meal'
-    },
-    {
-      'meal_id': "ABC1234",
-      'date': '2020-12-13T00:00:00.000Z',
-      'name': 'Chocolate Cake Time'
-    },
-    {
-      'meal_id': "ABC12345",
-      'date': '2020-12-15T00:00:00.000Z',
-      'name': 'Gingerbread house'
-    },
-    {
-      'meal_id': "ABC123456",
-      'date': '2020-12-21T00:00:00.000Z',
-      'name': 'Gingerbread house 2'
-    }
-  ]);
+
+  const { loading, error, data } = useQuery(MEALS_QUERY);
+
+  // const [meals, setMeals] = useState([
+  //   {
+  //     'meal_id': "ABC123",
+  //     'date': '2020-12-10T00:00:00.000Z',
+  //     'name': 'Pre-christmas family meal'
+  //   },
+  //   {
+  //     'meal_id': "ABC1234",
+  //     'date': '2020-12-13T00:00:00.000Z',
+  //     'name': 'Chocolate Cake Time'
+  //   },
+  //   {
+  //     'meal_id': "ABC12345",
+  //     'date': '2020-12-15T00:00:00.000Z',
+  //     'name': 'Gingerbread house'
+  //   },
+  //   {
+  //     'meal_id': "ABC123456",
+  //     'date': '2020-12-21T00:00:00.000Z',
+  //     'name': 'Gingerbread house 2'
+  //   }
+  // ]);
 
   useEffect(() => {
     if (!localStorage.getItem('accessToken') || getTokenType() === 'client') {
@@ -53,24 +57,32 @@ const Meals = props => {
     console.log(mealId);
   }
 
-
-  return (
-    <Container>
-      <div className={css(styles.titleContainer)}>
-        <h3>Meal Planner</h3>
-        {/* <div className={css(styles.rightContainer)}>
-          <div onClick={() => setActiveTab('calendar')} className={activeTab === 'calendar' ? css(styles.roundedIconActive) : css(styles.roundedIcon)}>
-            <BsCalendar size={20} />
-          </div>
-          <div onClick={() => setActiveTab('list')} className={activeTab === 'list' ? css(styles.roundedIconActive) : css(styles.roundedIcon)}>
-            <BsViewList size={22} />
-          </div>
-        </div> */}
-      </div>
-      {/* <hr style={{marginBottom: 30}}/> */}
-      <Calendar meals={meals} onClick={onMealClick} onDrag={onMealDragged} />
-    </Container>
-  )
+  if (!loading) {
+    if (error) {
+      message.error("Unable to fetch meals");
+    }
+    return (
+      <Container>
+        <div className={css(styles.titleContainer)}>
+          <h3>Meal Planner</h3>
+          {/* <div className={css(styles.rightContainer)}>
+            <div onClick={() => setActiveTab('calendar')} className={activeTab === 'calendar' ? css(styles.roundedIconActive) : css(styles.roundedIcon)}>
+              <BsCalendar size={20} />
+            </div>
+            <div onClick={() => setActiveTab('list')} className={activeTab === 'list' ? css(styles.roundedIconActive) : css(styles.roundedIcon)}>
+              <BsViewList size={22} />
+            </div>
+          </div> */}
+        </div>
+        {/* <hr style={{marginBottom: 30}}/> */}
+        <Calendar meals={data.meals} onClick={onMealClick} onDrag={onMealDragged} />
+      </Container>
+    )
+  } else {
+    return (
+      <Loader overlay={false} hasHeader={true} />
+    )
+  }
 }
 
 const styles = StyleSheet.create({

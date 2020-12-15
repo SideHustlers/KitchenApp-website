@@ -2,18 +2,10 @@ import { gql } from "@apollo/client";
 
 export const MEALS_QUERY = gql`
   query {
-    recipes {
-      recipe_id
+    meals {
+      meal_id
+      date
       name
-      prep_time
-      cook_time
-      difficulty
-      rating
-      author
-      description
-      media {
-        url
-      }
     }
   }
 `;
