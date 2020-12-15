@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, css } from 'aphrodite';
-import { Steps } from 'antd';
+import { Steps, Spin, Popover, DatePicker, message, InputNumber } from 'antd';
 import { Container } from 'reactstrap';
+import { useRouter } from 'next/router'
+import { useQuery } from "@apollo/client";
+import { IoAddSharp } from 'react-icons/io5';
+import moment from 'moment';
+import axios from '../../axios';
 
 import RecipeIngredient from '../../components/RecipeIngredient';
 import RecipeNutrition from "../../components/RecipeNutrition";
@@ -10,56 +15,22 @@ import RecipeTagBar from "../../components/RecipeTagBar";
 
 const { Step } = Steps;
 
+import {FULL_RECIPE_QUERY} from '../../gql/queries/recipes';
+
+
 const Recipe = props => {
-  const [recipe, setRecipe] = useState(
-    {
-      "name" : "Pulled Pork Sandwiches",
-      "prep_time" : "30 min",
-      "cook_time" : "10 min",
-      "difficulty" : 3,
-      "rating" : 5,
-      "special_requirements" : null,
-      "author" : "Andrew Galloway",
-      "accessibility" : "PUBLIC",
-      "type" : "meal",
-      "source" : "pramodgobburi.com",
-      "media": [
-        "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2015/7/2/0/DG0104H_pulled-pork-sandiwch_s4x3.jpg.rend.hgtvcom.826.620.suffix/1435869335054.jpeg",
-        "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2012/10/2/2/FNM_110112-Slow-Cooker-Pulled-Pork-Sandwiches-Recipe_s4x3.jpg.rend.hgtvcom.616.462.suffix/1504040037237.jpeg",
-      ],
-      "ingredients": [
-        "4 to 6 cups chicken stock or water",
-        "1 (3 pound) boneless pork butt",
-        "Salt and freshly ground black pepper",
-        "BBQ Sauce, recipe follows",
-        "8 to 12 soft buns with sesame seeds",
-        "Pickled Jalapenos, recipe follows",
-        "1 tablespoon canola oil",
-        "1 small Spanish onion, finely diced",
-        "1 jalapeno, finely diced",
-        "2 tomatoes, coarsely chopped",
-        "1 (15-ounce) can diced tomatoes",
-        "2 cups cider vinegar",
-        "1/4 cup honey",
-        "1/2 cup light brown sugar",
-        "1 tablespoon Worcestershire sauce",
-        "Salt",
-        "3 cups rice wine vinegar",
-        "3 tablespoons sugar",
-        "1 teaspoon white peppercorns",
-        "1 teaspoon coriander seeds",
-        "1 teaspoon mustard seeds",
-        "1/2 teaspoon cumin seeds",
-        "2 tablespoons kosher salt",
-        "3 jalapenos, sliced in half lengthwise",
-        "7 sprigs fresh cilantro"
-      ],
-      "instructions": "Special equipment: 1 (8-ounce) jar\nPreheat the grill to medium heat (the grill should maintain a constant temperature of 350 degrees F). Place a drip pan filled half-way with the chicken stock on the briquettes. Season the pork butt with salt and pepper and place on the grates of the grill over the drip pan. Close the cover of the grill and let the pork cook for 1 hour. Turn the pork over and continue grilling for 2 to 3 hours, or until it reaches an internal temperature of 160 degrees F. More chicken stock may be needed to refill the drip pan during grilling. Remove the pork from the grill and let rest for 15 minutes. When it is cool enough to handle, shred the pork into strands with your fingers. Add the shredded pork to the BBQ Sauce and serve on sandwich buns with the Pickled Jalapenos.\nHeat oil in a medium saucepan on the grates of the grill. Add the onion and jalapeno and cook until soft. Add the fresh tomatoes, canned tomatoes and juices, vinegar, honey, brown sugar and Worcestershire sauce, and cook until the sugar has completely melted and the sauce is slightly reduced and thickened. Season with salt, to taste. Add the shredded pork and stir to coat.\nCombine the vinegar, sugar, peppercorns, seeds, and salt in a medium saucepan and bring to a boil. Let boil for 2 minutes, and then remove from the heat and let sit until cooled to room temperature.\nPlace the jalapenos, stem side up, into the jar and pour enough cooled vinegar mixture over them to cover. Pack the cilantro sprigs into the jar. Cover and refrigerate for at least 24 hours and up to 4 days.",
-      "description": "Perfect for a crowd, this moist pulled pork, slow cooked with chicken broth, cider vinegar and barbecue sauce, is topped with a crunchy slaw for an easy dish that will help both your kitchen and you keep your cool.",
-      "serving_size" : 1,
-      "calories" : 400,
+  const router = useRouter();
+  const { loading, error, data } = useQuery(FULL_RECIPE_QUERY(router.query.id));
+  const [showPopover, setShowPopover] = useState(false);
+  const [date, setDate] = useState(null);
+  const [mealServing, setMealServing] = useState(null);
+  const [showAddMealBtn, setShowAddMealBtn] = useState(null);
+
+  useEffect(() => {
+    if (localStorage.getItem('accessToken')) {
+      setShowAddMealBtn(true);
     }
-  );
+  }, [])
 
   const generateUrls = (media) => {
     const urls = [];
@@ -71,68 +42,128 @@ const Recipe = props => {
     return urls;
   }
 
-  return (
-    <Container>
-      <div className={css(styles.info_container)}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', float: 'left', width: '100%', paddingLeft: 30}}>
-          {recipe.media.length > 1 ? (
-            <img className={css(styles.recipe_img)} src={recipe.media[0]} alt="recipe_img" />
-          ) : (
-            <img className={css(styles.recipe_img)} src={recipe.media[0]} alt="recipe_img" />
-          )}
-          
-          <div>
-            <RecipeTagBar tags={['Meal', 'Sandwich', 'Pork', 'BBQ']} />
-            <h1>
-              {recipe.name}
-            </h1>
-            <h6 className={css(styles.description)}>
-              {recipe.description}
-            </h6>
-            <RecipeInfoBar time={"30 min"} difficulty={"4"} serving={"2"} source={recipe.source} />
-          </div>
-        </div>
-      </div>
-      <div className={css(styles.subContainer)}>
-        <div className={css(styles.left)}>
-          <div className={css(styles.ingredients)}>
-            <div className={css(styles.greyContainer)}>
-              <p className={css(styles.ingredientsHeader)}>Ingredients:</p>
-              {recipe.ingredients.map((ingredient, idx) => (
-                <div>
-                  <RecipeIngredient index={idx} length={recipe.ingredients.length} ingredient={ingredient} />
-                </div>
-              ))}
-            </div>
-            
-          </div>
-          <div className={css(styles.ingredients)}>
-            <div className={css(styles.nutritionContainer)}>
-              <p className={css(styles.ingredientsHeader)}>Nutrition: (per serving)</p>
-              <RecipeNutrition index={0} length={2} name="Calories" value={recipe.calories} />
-              <RecipeNutrition index={1} length={2} name="Fats" value={recipe.calories} />
-            </div>
-          </div>
-        </div>
-        <div className={css(styles.right)}>
-          <h3>Steps</h3>
-          <hr/>
-          <div className={css(styles.stepsContainer)}>
-          <Steps direction="vertical">
-            {
-              recipe.instructions.split('\n').map((s) => (
-                s.split('. ').map(ns => (
-                  <Step status="process" title={ns + '.'} />
-                ))
-              ))
-            }
-          </Steps>
-          </div>
-        </div>
-      </div>
-    </Container>
-      
+  const disabledDates = (current) => {
+    const momentCurrent = moment(current);
+    const today = moment().subtract(1, 'day');
+    const thirtyDaysFromNow = moment().add(30, 'days');
+    return !(momentCurrent.isSameOrAfter(today) && momentCurrent.isSameOrBefore(thirtyDaysFromNow))
+  }
+  
+  const onChange = (date) => {
+    setDate(moment(date));
+  }
+
+  const makeMealFromRecipe = () => {
+    // Make request here
+    setDate(null);
+    setShowPopover(false);
+  }
+
+  const addMealContent = () => (
+    <div getPopupContainer={trigger => trigger.parentElement} style={{display: 'flex', flexDirection: 'column'}}>
+      <p class={css(styles.popoverFormHeading)}>Date</p>
+      <DatePicker disabledDate={disabledDates} style={{marginBottom: 10}} getPopupContainer={trigger => trigger.parentElement} onChange={onChange} value={date} />
+      <p class={css(styles.popoverFormHeading)}>Servings</p>
+      <InputNumber size="middle" placeholder="Servings" style={{width: '100%'}} min={1} value={mealServing} />
+      <input className={css(styles.addMenuBtn)} type="submit" value="Add" />
+    </div>
   );
+
+  const getImages = () => {
+    if (recipe.media.length > 0) {
+      return recipe.media[0].url;
+    } else {
+      return 'https://assets.materialup.com/uploads/b03b23aa-aa69-4657-aa5e-fa5fef2c76e8/preview.png';
+    }
+  }
+
+  useEffect(() => {
+    if (data && data.recipe) {
+      setMealServing(data.recipe.serving_size);
+    }
+  }, [data])
+
+  if (!loading) {
+    if (error) {
+      message.error("Unable to fetch recipe");
+      return null;
+    } else {
+      return (
+        <Container>
+          {showAddMealBtn && (
+            <div className={css(styles.bottomActionButtonContainer)}>
+              <Popover visible={showPopover} placement="topRight" content={addMealContent()} title={"Add to meal"} getPopupContainer={trigger => trigger.parentElement} >
+                <div className={!showPopover ? css(styles.createMealBtn) : css(styles.createMenuBtnClicked)} onClick={() => setShowPopover(!showPopover)}>
+                  <IoAddSharp size={40} color="white" />
+                </div>
+              </Popover>
+            </div>
+          )}
+          <div className={css(styles.info_container)}>
+            <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', float: 'left', width: '100%', paddingLeft: 30}}>
+              {data.recipe.media.length > 0 ? (
+                <img className={css(styles.recipe_img)} src={data.recipe.media[0].url} alt="recipe_img" />
+              ) : (
+                <img className={css(styles.recipe_img)} src={"https://assets.materialup.com/uploads/b03b23aa-aa69-4657-aa5e-fa5fef2c76e8/preview.png"} alt="recipe_img" />
+              )}
+              
+              <div style={{minWidth: 500}}>
+                <RecipeTagBar tags={data.recipe.tags} />
+                <h1>
+                  {data.recipe.name}
+                </h1>
+                <h6 className={css(styles.description)}>
+                  {data.recipe.description}
+                </h6>
+                <RecipeInfoBar time={data.recipe.prep_time} difficulty={data.recipe.difficulty} serving={data.recipe.serving_size} source={data.recipe.author} />
+              </div>
+            </div>
+          </div>
+          <div className={css(styles.subContainer)}>
+            <div className={css(styles.left)}>
+              <div className={css(styles.ingredients)}>
+                <div className={css(styles.greyContainer)}>
+                  <p className={css(styles.ingredientsHeader)}>Ingredients:</p>
+                  {data.recipe.ingredients.map((ingredient, idx) => (
+                    <div>
+                      <RecipeIngredient index={idx} length={data.recipe.ingredients.length} ingredient={ingredient.raw} />
+                    </div>
+                  ))}
+                </div>
+                
+              </div>
+              <div className={css(styles.ingredients)}>
+                <div className={css(styles.nutritionContainer)}>
+                  <p className={css(styles.ingredientsHeader)}>Nutrition: (per serving)</p>
+                  <RecipeNutrition index={0} length={2} name="Calories" value="100" />
+                  <RecipeNutrition index={1} length={2} name="Fats" value="100" />
+                </div>
+              </div>
+            </div>
+            <div className={css(styles.right)}>
+              <h3>Steps</h3>
+              <hr/>
+              <div className={css(styles.stepsContainer)}>
+              <Steps direction="vertical">
+                {
+                  data.recipe.steps.map((s) => (
+                      <Step status="process" title={s.description} />
+                  ))
+                }
+              </Steps>
+              </div>
+            </div>
+          </div>
+        </Container>
+          
+      );
+    }
+  } else {
+    return (
+      <Spin spinning={loading} delay={0} size="large" />
+    )
+  }
+
 }
 
 
@@ -184,7 +215,6 @@ const styles = StyleSheet.create({
     fontWeight: 200,
     fontSize: 18,
     marginBottom: 5,
-    fontFamily: 'castoro'
   },
   right: {
     flex: 1,
@@ -211,6 +241,50 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     paddingBottom: 20,
     // minHeight: '100%'
+  },
+  bottomActionButtonContainer: {
+    position: 'fixed',
+    bottom: 20,
+    right: 40,
+    display: 'flex',
+    zIndex: 1000,
+    flexDirection: 'column',
+  },
+  createMealBtn: {
+    transform: 'rotate(0deg)',
+    transition: '1s',
+    padding: 10,
+    backgroundColor: '#F43445',
+    borderRadius: 40,
+    cursor: 'pointer',
+    boxShadow: '0 0 45px rgba(0, 0, 0, 0.1)',
+  },
+  createMenuBtnClicked: {
+    transform: 'rotate(45deg)',
+    transition: '1s',
+    padding: 10,
+    backgroundColor: '#F43445',
+    borderRadius: 40,
+    cursor: 'pointer',
+    boxShadow: '0 0 45px rgba(0, 0, 0, 0.1)',
+  },
+  addMenuBtn: {
+    backgroundColor: '#F43445',
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    borderRadius: 20,
+    border: 'none',
+    outline: 'none',
+    marginTop: 10,
+    color: 'white',
+    fontWeight: 'bold',
+    boxShadow: '0 0 25px rgba(0, 0, 0, 0.1)',
+  },
+  popoverFormHeading: {
+    fontSize: 14,
+    marginBottom: 5,
   }
 })
 

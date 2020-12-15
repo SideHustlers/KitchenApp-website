@@ -1,28 +1,28 @@
-.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected  {
-  color: #F43445 !important;
-  border-bottom: none !important;
+.nav-item {
+  margin-right: 20px;
 }
 
-.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover {
-  color: #F43445 !important;
-  border-bottom: 2px solid #F43445 !important;
+.nav-link {
+  color: gray;
+  border-bottom: 1px solid transparent !important;
 }
 
-.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item {
-  margin-top: -5px !important;
-  font-family: 'montserrat';
-  font-size: 16px;
-  vertical-align: top;
-  top: 7px !important;
-  color: #808080;
-  border-bottom: none !important;
+.nav-link:hover {
+  color: red;
+  border-bottom: 1px solid #F43445 !important;
 }
 
-.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected a  {
-  color: inherit !important;
-  border-bottom: none !important;
+.nav-link:hover a {
+  color: #F43445;
 }
-.ant-menu-horizontal > .ant-menu-item a {
-  color: inherit !important;
-  border-bottom: none !important;
+
+.active {
+  color: #F43445;
+}
+.navbar {
+  width: 100%;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); 
 }

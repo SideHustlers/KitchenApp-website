@@ -1,5 +1,7 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
+import { REFRESH_TOKEN_URL } from './urls';
+import { getAccessToken } from './helpers/auth';
 
 const defaultOptions = {
   headers: {
@@ -7,10 +9,13 @@ const defaultOptions = {
   },
 };
 let instance = axios.create(defaultOptions);
+
 instance.interceptors.request.use(async function(config) {
   try {
-
-    config.headers.Authorization = 'Bearer ' + localStorage.getItem('accessToken');
+    let token = await getAccessToken();
+    if (token != null) {
+      config.headers.Authorization = 'Bearer ' + token;
+    }
   } catch (error) {
     console.log(error);
     return false;

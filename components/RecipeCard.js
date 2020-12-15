@@ -14,7 +14,15 @@ const RecipeCard = ({ recipe, index, length, history }) => {
 
   const goToRecipe = () => {
     // history.push('/recipes/recipe');
-    router.push('/recipes/abc');
+    router.push('/recipes/' + recipe.recipe_id);
+  }
+
+  const getRecipeImage = () => {
+    if (recipe.media.length > 0) {
+      return recipe.media[0].url;
+    } else {
+      return 'https://assets.materialup.com/uploads/b03b23aa-aa69-4657-aa5e-fa5fef2c76e8/preview.png';
+    }
   }
 
   return (
@@ -24,7 +32,7 @@ const RecipeCard = ({ recipe, index, length, history }) => {
         <button className={css(styles.redButton)} onClick={() => goToRecipe()}>View Recipe</button>
       </div>
       }
-      <img className={css(styles.recipeImg)} src={recipe.media[0]} alt="recipe_img" />
+      <img className={css(styles.recipeImg)} src={getRecipeImage()} alt="recipe_img" />
       <div style={{marginLeft: 10, marginRight: 10}}>
         <p className={css(styles.recipeName)}>{recipe.name}</p>
         <p className={css(styles.recipeDescription)}>{generateDescription(recipe.description)}</p>

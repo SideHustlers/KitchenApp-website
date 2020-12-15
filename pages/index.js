@@ -43,7 +43,7 @@ const HomePage = props => {
 const styles = StyleSheet.create({
   bgImgContainer: {
     width: '100%',
-    height: 'calc(100vh - 74px)',
+    height: 'calc(100vh - 70px)',
     backgroundImage: 'url("https://images.pexels.com/photos/256318/pexels-photo-256318.jpeg")',
     backgroundSize: 'cover'
   },
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 900,
+    zIndex: 10,
     paddingBottom: 70,
   },
   searchContainer: {

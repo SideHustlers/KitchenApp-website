@@ -1,5 +1,5 @@
 import Axios from 'axios';
-const urls = require('../../urls');
+const urls = require('../../../urls');
 
 export default async function handler(req, res) {
   const {
@@ -7,12 +7,16 @@ export default async function handler(req, res) {
     method,
   } = req;
 
-  if (method === "POST") {
+  if (method === "GET") {
     try {
+      let payload  ={
+        client_id: process.env.clientId,
+        client_secret: process.env.clientSecret
+      }
       let response = await Axios({
         method: 'POST',
-        url: urls.REGISTER_URL,
-        data: req.body
+        url: urls.CLIENT_AUTH_URL,
+        data: payload
       });
       res.status(200).json(response.data); 
     } catch (err) {

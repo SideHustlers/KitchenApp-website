@@ -8,7 +8,6 @@ const { Header, Content } = Layout;
 
 
 const Main = props => {
-
   return (
     <div className="App">
       <Layout>

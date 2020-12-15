@@ -3,6 +3,7 @@ import { StyleSheet, css } from 'aphrodite';
 import { useRouter } from 'next/router';
 import Axios from 'axios';
 import { message, Spin } from 'antd';
+import { checkTokenType } from '../helpers/auth';
 
 const Login = props => {
   const router = useRouter();
@@ -11,7 +12,7 @@ const Login = props => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    if (localStorage.getItem('accessToken')) {
+    if (checkTokenType('user')) {
       router.push('/');
     }
   }, []);
@@ -30,7 +31,13 @@ const Login = props => {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       setLoading(false);
-      router.push('/');
+      if (localStorage.getItem('redirectUrl')) {
+        let redirectUrl = localStorage.getItem('redirectUrl');
+        localStorage.removeItem('redirectUrl');
+        router.push(redirectUrl);
+      } else {
+        router.push('/')
+      }
     } catch(err) {
       console.log(err.response);
       setLoading(false);
