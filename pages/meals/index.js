@@ -11,33 +11,17 @@ import Loader from "../../components/Loader";
 import { MEALS_QUERY } from '../../gql/queries/meals';
 import { useQuery } from "@apollo/client";
 
+import { moveMeal } from '../../helpers/api/meal';
+
 const Meals = props => {
   const router = useRouter();
 
-  const { loading, error, data } = useQuery(MEALS_QUERY);
+  const { loading, error, data, refetch:refetchMeals } = useQuery(MEALS_QUERY);
 
-  // const [meals, setMeals] = useState([
-  //   {
-  //     'meal_id': "ABC123",
-  //     'date': '2020-12-10T00:00:00.000Z',
-  //     'name': 'Pre-christmas family meal'
-  //   },
-  //   {
-  //     'meal_id': "ABC1234",
-  //     'date': '2020-12-13T00:00:00.000Z',
-  //     'name': 'Chocolate Cake Time'
-  //   },
-  //   {
-  //     'meal_id': "ABC12345",
-  //     'date': '2020-12-15T00:00:00.000Z',
-  //     'name': 'Gingerbread house'
-  //   },
-  //   {
-  //     'meal_id': "ABC123456",
-  //     'date': '2020-12-21T00:00:00.000Z',
-  //     'name': 'Gingerbread house 2'
-  //   }
-  // ]);
+  useEffect(() => {
+    console.log('useEffect')
+    refetchMeals()
+  }, [])
 
   useEffect(() => {
     if (!localStorage.getItem('accessToken') || getTokenType() === 'client') {
@@ -49,12 +33,16 @@ const Meals = props => {
   const onMealClick = meal => {
     console.log('meal clicked', meal);
     message.success('meal clicked');
+    router.push('/meals/' + meal.meal_id);
   }
 
-  const onMealDragged = (source, destination, mealId) => {
-    console.log(source);
-    console.log(destination);
-    console.log(mealId);
+  const onMealDragged = async (source, destination, mealId) => {
+    if (destination != null && source != null) {
+      if (destination.index != source.index) {
+        await moveMeal(mealId, destination.droppableId);
+      }
+    }
+    refetchMeals()
   }
 
   if (!loading) {
