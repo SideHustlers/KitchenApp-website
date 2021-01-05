@@ -46,7 +46,6 @@ module.exports = {
     }
   },
 
-  // TODO: TEST
   moveMeal: async (mealId, date) => {
     try {
       const res = await axios.put(
@@ -64,6 +63,28 @@ module.exports = {
 
     } catch(error) {
       throw new Error(error);
+    }
+  },
+
+  // TODO: TEST
+  deleteMeal: async (mealId) => {
+    try {
+      const res = await axios.delete(
+        urls.MEAL_URL + '/' + mealId + '\delete',
+        {}
+      );
+
+      if (res.data.status == 'successful') {
+        if (res.data.hasPayload) {
+          console.log(res.data.payload)
+          return res.data.payload;
+        }
+      } else {
+        throw new Error(res);
+      }
+
+    } catch (error) {
+      throw error;
     }
   }
 }

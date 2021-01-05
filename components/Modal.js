@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from 'antd';
 
-const AllListsModal = ({title, content, isVisible, onOk, onCancel}) => {
+const customModal = ({title, content, isVisible, onOk, onCancel}) => {
   return (
     <Modal
       title={title}
@@ -24,4 +24,4 @@ const AllListsModal = ({title, content, isVisible, onOk, onCancel}) => {
   )
 };
 
-export default AllListsModal;
+export default customModal;

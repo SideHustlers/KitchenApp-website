@@ -7,19 +7,23 @@ import { message } from "antd";
 import { useRouter } from "next/router";
 import { getTokenType } from '../../helpers/auth';
 import Loader from "../../components/Loader";
+import { Form, Input } from 'antd';
 
 import { MEALS_QUERY } from '../../gql/queries/meals';
 import { useQuery } from "@apollo/client";
 
-import { moveMeal } from '../../helpers/api/meal';
+import { moveMeal, editMeal } from '../../helpers/api/meal';
+import Modal from '../../components/Modal';
 
 const Meals = props => {
   const router = useRouter();
 
   const { loading, error, data, refetch:refetchMeals } = useQuery(MEALS_QUERY);
+  const [ isEditModalVisible, setIsEditModalVisible ] = useState(null);
+  const [ meal, setMeal ] = useState(null);
+  const [ mealName, setMealName ] = useState(null);
 
   useEffect(() => {
-    console.log('useEffect')
     refetchMeals()
   }, [])
 
@@ -30,10 +34,27 @@ const Meals = props => {
     }
   })
 
+  const onEditHandleOk = async () => {
+    await editMeal(meal.meal_id, mealName);
+    setIsEditModalVisible(false);
+    setMealName(null);
+    setMeal(null);
+    // refetchMeal
+  }
+
+  const onEditHandleCancel = () => {
+    setIsEditModalVisible(false);
+    setMealName(null);
+    setMeal(null);
+  }
+
   const onMealClick = meal => {
-    console.log('meal clicked', meal);
-    message.success('meal clicked');
-    router.push('/meals/' + meal.meal_id);
+    // console.log('meal clicked', meal);
+    // message.success('meal clicked');
+    setMealName(meal.name);
+    setMeal(meal);
+    setIsEditModalVisible(true);
+    // router.push('/meals/' + meal.meal_id);
   }
 
   const onMealDragged = async (source, destination, mealId) => {
@@ -44,6 +65,17 @@ const Meals = props => {
     }
     refetchMeals()
   }
+
+  const editModalContent = (
+    <Form layout="horizontal">
+      <Form.Item 
+        label="Meal Name"
+        name="mealName"
+      >
+        <Input placeholder='Meal Name' value={mealName} onChange={e => setMealName(e.target.value)} />
+      </Form.Item>
+    </Form>
+  );
 
   if (!loading) {
     if (error) {
@@ -64,6 +96,7 @@ const Meals = props => {
         </div>
         {/* <hr style={{marginBottom: 30}}/> */}
         <Calendar meals={data.meals} onClick={onMealClick} onDrag={onMealDragged} />
+        <Modal title={'Rename Meal'} content={editModalContent} isVisible={isEditModalVisible} onOk={onEditHandleOk} onCancel={onEditHandleCancel} />
       </Container>
     )
   } else {
