@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, css } from 'aphrodite';
 import { Container } from 'reactstrap';
 import GroceryList from '../../components/GroceryList';
@@ -12,7 +12,7 @@ import { toggleListItem } from '../../helpers/api/list_items';
 
 const Lists = props => {
   
-  const { loading, error, data, refetch:refetchGroceryList } = useQuery(GROCERY_LIST_QUERY);
+  const { loading, error, data, refetch } = useQuery(GROCERY_LIST_QUERY);
   
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -43,13 +43,27 @@ const Lists = props => {
     }
   });
 
+  useEffect(() => {
+    refetch();
+  }, [])
+
+  useEffect(() => {
+    console.log('Sindex', selectedIndex)
+    if (data && selectedIndex >= data.grocery_lists.length) {
+      console.log("data.lists.length", data.grocery_lists.length);
+      console.log("calculated index", data.grocery_lists.length - 1);
+      setSelectedIndex(data.grocery_lists.length - 1);
+      console.log('sIndex', selectedIndex);
+    }
+  }, [data])
+
   const onListClick = index => {
     setSelectedIndex(index);
   }
 
   const onListItemCheck = async (item, checked) => {
     await toggleListItem(data.grocery_lists[selectedIndex].grocery_list_id, item.list_item_id);
-    refetchGroceryList()
+    refetch();
   }
 
   if (!loading) {
@@ -64,10 +78,10 @@ const Lists = props => {
         {/* <hr style={{marginBottom: 30}}/> */}
         <div className={css(styles.splitContainer)}>
           <div className={css(styles.leftContainer)}>
-            <AllLists lists={data.grocery_lists} selectedList={selectedIndex} onListClick={onListClick} refetch={refetchGroceryList}/>
+            <AllLists lists={data.grocery_lists} selectedList={selectedIndex} onListClick={onListClick} refetch={refetch}/>
           </div>
           <div className={css(styles.rightContainer)}>
-            <GroceryList list={data.grocery_lists[selectedIndex]} onListItemCheck={onListItemCheck} />
+            <GroceryList list={data.grocery_lists[selectedIndex]} onListItemCheck={onListItemCheck} refetch={refetch}/>
           </div>
         </div>
       </Container>

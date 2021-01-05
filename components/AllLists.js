@@ -24,6 +24,10 @@ const AllLists = ({ lists, selectedList, onListClick, refetch }) => {
   })
 
   useEffect(() => {
+    setShownLists(lists)
+  }, [lists])
+
+  useEffect(() => {
     if (search != '') {
       let matchingList = [];
       matchingList.push(lists[selectedList]);
@@ -50,7 +54,7 @@ const AllLists = ({ lists, selectedList, onListClick, refetch }) => {
     await createGroceryList(listName, []);
     setListName(null);
     setShowCreatePopover(false);
-    refetch(); // ! Not working
+    refetch();
   }
 
   const createGeneratedList = async() => {
@@ -59,7 +63,7 @@ const AllLists = ({ lists, selectedList, onListClick, refetch }) => {
     setStartDate(null);
     setEndDate(null);
     setShowGeneratePopover(false);
-    refetch(); // ! Not working
+    refetch();
   }
 
   const createListContent = () => (    
@@ -93,7 +97,7 @@ const AllLists = ({ lists, selectedList, onListClick, refetch }) => {
       <div className={css(styles.allListContainer)}>
         {
           shownLists.map((list, index) => (
-            <AllListItem key={'all_list_item_' + index}item={list} index={index} selected={index === selectedList} onListClick={onListClick} />
+            <AllListItem key={'all_list_item_' + index} item={list} index={index} selected={index === selectedList} onListClick={onListClick} refetch={refetch} />
           ))
         }
       </div>

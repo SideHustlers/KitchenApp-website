@@ -6,13 +6,13 @@ import { Menu, Dropdown, Form, Input, DatePicker } from 'antd';
 
 import { updateGroceryList, editGroceryList, deleteGroceryList } from '../helpers/api/grocery_list';
 import Modal from './Modal';
-const AllListItem = ({ item, index, onListClick, selected }) => {
+const AllListItem = ({ item, index, onListClick, refetch, selected  }) => {
 
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [showListOptions, setShowListOptions] = useState(false);
-  const [name, setName] = useState(item.name);
+  const [name, setName] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -85,6 +85,7 @@ const AllListItem = ({ item, index, onListClick, selected }) => {
     setIsUpdateModalVisible(false);
     setStartDate(null);
     setEndDate(null);
+    refetch();
   }
 
   const onUpdateHandleCancel = () => {
@@ -97,7 +98,7 @@ const AllListItem = ({ item, index, onListClick, selected }) => {
     await editGroceryList(item.grocery_list_id, name);
     setIsEditModalVisible(false);
     setName(item.name);
-        // refetch AllListItem
+    refetch();
   }
 
   const onEditHandleCancel = () => {
@@ -108,7 +109,7 @@ const AllListItem = ({ item, index, onListClick, selected }) => {
   const onDeleteHandleOk = async () => {
     await deleteGroceryList(item.grocery_list_id);
     setIsDeleteModalVisible(false);
-    // refetch AllListItem
+    refetch();
   }
 
   const onDeleteHandleCancel = () => {
@@ -134,7 +135,7 @@ const AllListItem = ({ item, index, onListClick, selected }) => {
         label="List Name"
         name="listName"
       >
-        <Input placeholder='List Name' value={name} onChange={e => setName(e.target.value)} />
+        <Input placeholder='List Name' defaultValue={name} value={name} onChange={e => setName(e.target.value)} />
       </Form.Item>
     </Form>
   );

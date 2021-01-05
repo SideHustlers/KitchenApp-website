@@ -8,13 +8,17 @@ import Modal from './Modal';
 import { createListItem } from '../helpers/api/list_items';
 
 
-const GroceryList = ({ list, onListItemCheck }) => {
+const GroceryList = ({ list, onListItemCheck, refetch }) => {
 
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [itemName, setItemName] = useState(null);
   const [itemQuantity, setItemQuantity] = useState(null);
   const [itemUnit, setItemUnit] = useState(null);
   const [itemNote, setItemNote] = useState(null);
+
+  useEffect(() => {
+    console.log('list', list);
+  }, [list])
   
   const createItemForm = (
     <Form>
@@ -40,11 +44,11 @@ const GroceryList = ({ list, onListItemCheck }) => {
   const onCreateItemHandleOk = async () => {
     await createListItem(list.grocery_list_id, itemQuantity, itemUnit, itemName, itemNote);
     setIsCreateModalVisible(false);
-    // TODO: refetch()
     setItemName(null);
     setItemQuantity(null);
     setItemUnit(null);
-    setItemNote(null);    
+    setItemNote(null);
+    refetch();    
   }
 
   const onCreateItemHandleCancel = () => {

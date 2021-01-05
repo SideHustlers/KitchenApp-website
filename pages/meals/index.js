@@ -39,7 +39,7 @@ const Meals = props => {
     setIsEditModalVisible(false);
     setMealName(null);
     setMeal(null);
-    // refetchMeal
+    refetchMeals();
   }
 
   const onEditHandleCancel = () => {
@@ -48,13 +48,10 @@ const Meals = props => {
     setMeal(null);
   }
 
-  const onMealClick = meal => {
-    // console.log('meal clicked', meal);
-    // message.success('meal clicked');
-    setMealName(meal.name);
-    setMeal(meal);
+  const onMealClick = m => {
+    setMealName(m.name);
+    setMeal(m);
     setIsEditModalVisible(true);
-    // router.push('/meals/' + meal.meal_id);
   }
 
   const onMealDragged = async (source, destination, mealId) => {
@@ -72,7 +69,7 @@ const Meals = props => {
         label="Meal Name"
         name="mealName"
       >
-        <Input placeholder='Meal Name' value={mealName} onChange={e => setMealName(e.target.value)} />
+        <Input placeholder='Meal Name' defaultValue={mealName} value={mealName} onChange={e => setMealName(e.target.value)} />
       </Form.Item>
     </Form>
   );
