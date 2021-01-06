@@ -110,7 +110,7 @@ const GroceryList = ({ list, onListItemCheck, refetch }) => {
   });
 
   return (
-    <div className={css(styles.mainContainer)}>
+    (list ? <div className={css(styles.mainContainer)}>
       <div className={css(styles.header)}>
         <p className={css(styles.listNameTxt)}>{list.name}</p>
         <div>
@@ -127,7 +127,7 @@ const GroceryList = ({ list, onListItemCheck, refetch }) => {
         }
       </div>
       <Modal title={'Create Item'} content={createItemForm} isVisible={isCreateModalVisible} onOk={onCreateItemHandleOk} onCancel={onCreateItemHandleCancel} />
-    </div>
+    </div>: null)
   )
 }
 
