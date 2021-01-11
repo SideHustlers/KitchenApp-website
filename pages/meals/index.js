@@ -7,37 +7,25 @@ import { message } from "antd";
 import { useRouter } from "next/router";
 import { getTokenType } from '../../helpers/auth';
 import Loader from "../../components/Loader";
+import { Form, Input } from 'antd';
 
 import { MEALS_QUERY } from '../../gql/queries/meals';
 import { useQuery } from "@apollo/client";
 
+import { moveMeal, editMeal } from '../../helpers/api/meal';
+import Modal from '../../components/Modal';
+
 const Meals = props => {
   const router = useRouter();
 
-  const { loading, error, data } = useQuery(MEALS_QUERY);
+  const { loading, error, data, refetch:refetchMeals } = useQuery(MEALS_QUERY);
+  const [ isEditModalVisible, setIsEditModalVisible ] = useState(null);
+  const [ meal, setMeal ] = useState(null);
+  const [ mealName, setMealName ] = useState(null);
 
-  // const [meals, setMeals] = useState([
-  //   {
-  //     'meal_id': "ABC123",
-  //     'date': '2020-12-10T00:00:00.000Z',
-  //     'name': 'Pre-christmas family meal'
-  //   },
-  //   {
-  //     'meal_id': "ABC1234",
-  //     'date': '2020-12-13T00:00:00.000Z',
-  //     'name': 'Chocolate Cake Time'
-  //   },
-  //   {
-  //     'meal_id': "ABC12345",
-  //     'date': '2020-12-15T00:00:00.000Z',
-  //     'name': 'Gingerbread house'
-  //   },
-  //   {
-  //     'meal_id': "ABC123456",
-  //     'date': '2020-12-21T00:00:00.000Z',
-  //     'name': 'Gingerbread house 2'
-  //   }
-  // ]);
+  useEffect(() => {
+    refetchMeals()
+  }, [])
 
   useEffect(() => {
     if (!localStorage.getItem('accessToken') || getTokenType() === 'client') {
@@ -46,16 +34,45 @@ const Meals = props => {
     }
   })
 
-  const onMealClick = meal => {
-    console.log('meal clicked', meal);
-    message.success('meal clicked');
+  const onEditHandleOk = async () => {
+    await editMeal(meal.meal_id, mealName);
+    setIsEditModalVisible(false);
+    setMealName(null);
+    setMeal(null);
+    refetchMeals();
   }
 
-  const onMealDragged = (source, destination, mealId) => {
-    console.log(source);
-    console.log(destination);
-    console.log(mealId);
+  const onEditHandleCancel = () => {
+    setIsEditModalVisible(false);
+    setMealName(null);
+    setMeal(null);
   }
+
+  const onMealClick = m => {
+    setMealName(m.name);
+    setMeal(m);
+    setIsEditModalVisible(true);
+  }
+
+  const onMealDragged = async (source, destination, mealId) => {
+    if (destination != null && source != null) {
+      if (destination.index != source.index) {
+        await moveMeal(mealId, destination.droppableId);
+      }
+    }
+    refetchMeals()
+  }
+
+  const editModalContent = (
+    <Form layout="horizontal">
+      <Form.Item 
+        label="Meal Name"
+        name="mealName"
+      >
+        <Input placeholder='Meal Name' defaultValue={mealName} value={mealName} onChange={e => setMealName(e.target.value)} />
+      </Form.Item>
+    </Form>
+  );
 
   if (!loading) {
     if (error) {
@@ -76,6 +93,7 @@ const Meals = props => {
         </div>
         {/* <hr style={{marginBottom: 30}}/> */}
         <Calendar meals={data.meals} onClick={onMealClick} onDrag={onMealDragged} />
+        <Modal title={'Rename Meal'} content={editModalContent} isVisible={isEditModalVisible} onOk={onEditHandleOk} onCancel={onEditHandleCancel} />
       </Container>
     )
   } else {

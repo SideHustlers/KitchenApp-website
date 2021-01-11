@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, css } from 'aphrodite';
 import { Container } from 'reactstrap';
 import GroceryList from '../../components/GroceryList';
@@ -8,87 +8,11 @@ import Loader from "../../components/Loader";
 import { GROCERY_LIST_QUERY } from '../../gql/queries/grocery_lists';
 import { useQuery } from "@apollo/client";
 import { message } from 'antd';
+import { toggleListItem } from '../../helpers/api/list_items';
 
 const Lists = props => {
-
-  // const [lists, setLists] = useState([
-  //   {
-  //     'name': 'Weekly groceries',
-  //     'start_date': '2020-12-08T00:00:00.000Z',
-  //     'end_date': '2020-12-13T00:00:00.000Z',
-  //     'items': [
-  //       {
-  //         'name': '12oz Hershey Kisses chocolate',
-  //         'checked': false
-  //       },
-  //       {
-  //         'name': '24oz All purpose flour',
-  //         checked: false
-  //       },
-  //       {
-  //         'name': '2 sticks Salted Butter',
-  //         'checked': true
-  //       },
-  //       {
-  //         'name': '12oz Hershey Kisses chocolate',
-  //         'checked': false
-  //       },
-  //       {
-  //         'name': '24oz All purpose flour',
-  //         checked: false
-  //       },
-  //       {
-  //         'name': '2 sticks Salted Butter',
-  //         'checked': true
-  //       },
-  //       {
-  //         'name': '12oz Hershey Kisses chocolate',
-  //         'checked': false
-  //       },
-  //       {
-  //         'name': '24oz All purpose flour',
-  //         checked: false
-  //       },
-  //       {
-  //         'name': '2 sticks Salted Butter',
-  //         'checked': true
-  //       },
-  //       {
-  //         'name': '12oz Hershey Kisses chocolate',
-  //         'checked': false
-  //       },
-  //       {
-  //         'name': '24oz All purpose flour',
-  //         checked: false
-  //       },
-  //       {
-  //         'name': '2 sticks Salted Butter',
-  //         'checked': true
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     'name': 'Christmas groceries',
-  //     'start_date': '2020-12-24T00:00:00.000Z',
-  //     'end_date': '2020-12-29T00:00:00.000Z',
-  //     'items': [
-  //       {
-  //         'name': '12oz Hershey Kisses chocolate',
-  //         'checked': false
-  //       },
-  //       {
-  //         'name': '24oz All purpose flour',
-  //         checked: false
-  //       },
-  //       {
-  //         'name': '2 sticks Salted Butter',
-  //         'checked': true
-  //       },
-  //     ]
-  //   },
-  // ]);
   
-  const { loading, error, data } = useQuery(GROCERY_LIST_QUERY);
+  const { loading, error, data, refetch } = useQuery(GROCERY_LIST_QUERY);
   
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -119,8 +43,27 @@ const Lists = props => {
     }
   });
 
+  useEffect(() => {
+    refetch();
+  }, [])
+
+  useEffect(() => {
+    console.log('Sindex', selectedIndex)
+    if (data && selectedIndex >= data.grocery_lists.length) {
+      console.log("data.lists.length", data.grocery_lists.length);
+      console.log("calculated index", data.grocery_lists.length - 1);
+      setSelectedIndex(data.grocery_lists.length - 1);
+      console.log('sIndex', selectedIndex);
+    }
+  }, [data])
+
   const onListClick = index => {
     setSelectedIndex(index);
+  }
+
+  const onListItemCheck = async (item, checked) => {
+    await toggleListItem(data.grocery_lists[selectedIndex].grocery_list_id, item.list_item_id);
+    refetch();
   }
 
   if (!loading) {
@@ -135,10 +78,10 @@ const Lists = props => {
         {/* <hr style={{marginBottom: 30}}/> */}
         <div className={css(styles.splitContainer)}>
           <div className={css(styles.leftContainer)}>
-            <AllLists lists={data.grocery_lists} selectedList={selectedIndex} onListClick={onListClick} />
+            <AllLists lists={data.grocery_lists} selectedList={selectedIndex} onListClick={onListClick} refetch={refetch}/>
           </div>
           <div className={css(styles.rightContainer)}>
-            <GroceryList list={data.grocery_lists[selectedIndex]} />
+            <GroceryList list={data.grocery_lists[selectedIndex]} onListItemCheck={onListItemCheck} refetch={refetch}/>
           </div>
         </div>
       </Container>
